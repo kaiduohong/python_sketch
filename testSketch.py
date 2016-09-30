@@ -4,22 +4,22 @@ from sklearn import svm
 from simpleSketch import *
 from sketchTrial import  *
 from getSketch import *
-import scipy.io as sio
+#import scipy.io as sio
 from simpleSketchWithRandom import *
 #from belongWhichPieces import *
 from scipy.linalg.misc import norm
 import numpy.linalg
-#import h5py
-#logFile = raw_input('logFileName\n')
+import h5py
+logFile = raw_input('logFileName\n')
 lg.basicConfig(level=lg.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
-                filename='./log/log.log',#+logFile,
+                filename='./log/'+logFile,
                 filemode='w')
-matFileName = u'./data/multiPie.mat'
-#matFileName = u'../data/MultiPieGRAY.mat'
-#data = h5py.File(matFileName)
-data = sio.loadmat(matFileName)
+#matFileName = u'./data/multiPie.mat'
+matFileName = u'../data/MultiPieGRAY.mat'
+data = h5py.File(matFileName)
+#data = sio.loadmat(matFileName)
 print np.shape(data['samples'])
 sketchNum = 40
 samples = np.array(data['samples']).transpose()
@@ -61,7 +61,7 @@ originalSketchTestData = testSamples * sketchM
 sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
  
-print 'norm = ',norm(sketchM.transpose() - Pieces['rightSubspace'][0],'fro')
+print 'norm = ',norm(sketchM.transpose()*sketchM - Pieces['rightSubspace'][0]*Pieces['rightSubspace'][0].transpose(),'fro')
 raw_input('pause pause')
 time1 = time.time()
 randSketch = randSimpleSketch(trainSamples, sketchNum)
@@ -71,7 +71,6 @@ randSketchTime = time.time() - time1
 lg.info('generate randSketch data time = ' + str(randSketchTime))
 time1 = time.time()
 [Null, Null, pcaM] = np.linalg.svd(trainSamples, full_matrices=False)
- 
 pcaM = np.matrix(pcaM[0:sketchNum].transpose())
 pcaTrain = trainSamples * pcaM
 pcaTest = testSamples * pcaM
