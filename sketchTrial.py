@@ -13,7 +13,7 @@ def sketchTrial(data, sketchNum):
     #alpha = 2
     #beta = 0.01
 
-    threadhold = 0.3
+    threadhold = 0.155555
     numberOfPieces = 0
 
 

@@ -31,14 +31,14 @@ labels = np.array(data['label']).ravel()
 print 'generate data begin!!!'
 lg.info('generate data begin!!!')
  
-proportion = 0.005
+proportion = 0.5
 index = range(sampleNum)
 selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
 trainSamples = np.matrix(samples[selectedIndex])
 trainLabels = labels[selectedIndex]
  
 testIndex = selectedIndex
-#testIndex = list(set(index) - set(selectedIndex))
+testIndex = list(set(index) - set(selectedIndex))
  
 testSamples = np.matrix(samples[testIndex])
 testLabels = labels[testIndex]
