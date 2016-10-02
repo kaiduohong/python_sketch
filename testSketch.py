@@ -62,7 +62,7 @@ sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
  
 print 'norm = ',norm(sketchM.transpose()*sketchM - Pieces['rightSubspace'][0]*Pieces['rightSubspace'][0].transpose(),'fro')
-raw_input('pause pause')
+
 time1 = time.time()
 randSketch = randSimpleSketch(trainSamples, sketchNum)
 randSketchTrainData = trainSamples * randSketch
