@@ -13,7 +13,7 @@ import h5py
 logFile = raw_input('logFileName\n')
 lg.basicConfig(level=lg.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                datefmt='%a, %d %b %Y %H:%M:%S',
+                datefmt='%a,%d,%b,%Y,%H:%M:%S',
                 filename='./log/'+logFile,
                 filemode='w')
 #matFileName = u'./data/multiPie.mat'
@@ -31,7 +31,7 @@ labels = np.array(data['label']).ravel()
 print 'generate data begin!!!'
 lg.info('generate data begin!!!')
  
-proportion = 0.5
+proportion = 0.60
 index = range(sampleNum)
 selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
 trainSamples = np.matrix(samples[selectedIndex])
