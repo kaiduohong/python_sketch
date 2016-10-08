@@ -10,7 +10,7 @@ def simpleSketch(A, sketchRowNum):
     zeroRowNum = sketchRowNum
     iter = 0
     while iter < n:
-        if iter % 100 == 0:
+        if iter % 1000 == 0:
             print 'simpleSketch_sketchIter = '+ str(iter)
 
         [Null, S, V] = np.linalg.svd(B,full_matrices=False)
@@ -22,12 +22,15 @@ def simpleSketch(A, sketchRowNum):
         B = np.matrix(np.diag(S )) * V
         zeroRowNum = sum(S <= sys.float_info.epsilon)
 
-        index = min(iter + zeroRowNum, n)
-        if iter + zeroRowNum <= n:
-           B[sketchRowNum - zeroRowNum : sketchRowNum] = A[iter : index]
-        else:
-           B[sketchRowNum - zeroRowNum : sketchRowNum - (iter + zeroRowNum - n)] = A[iter : index]
-        iter = iter + zeroRowNum + 1
+       # index = min(iter + zeroRowNum, n)
+       # if iter + zeroRowNum <= n:
+       #    B[sketchRowNum - zeroRowNum : sketchRowNum] = A[iter : index]
+       # else:
+       #    B[sketchRowNum - zeroRowNum : sketchRowNum - (iter + zeroRowNum - n)] = A[iter : index]
+       # iter = iter + zeroRowNum + 1
+	B[sketchRowNum - zeroRowNum] = A[iter]
+        iter = iter + 1
+ 
 
     [Null, Null, B] = np.linalg.svd(B, full_matrices=False)
     return B.transpose()

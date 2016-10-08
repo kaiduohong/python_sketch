@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from belongWhichPieces import *
 from scipy.linalg.misc import norm
-def sketchTrial(data, sketchNum):
+def sketchTrial(data, sketchNum, threadhold):
     if type(data) != np.matrixlib.defmatrix.matrix:
         raise TypeError('data is not a matrix, type = ' + str(type(data)))
 
@@ -13,7 +13,6 @@ def sketchTrial(data, sketchNum):
     #alpha = 2
     #beta = 0.01
 
-    threadhold = 0.155555
     numberOfPieces = 0
 
 

@@ -10,6 +10,11 @@ from simpleSketchWithRandom import *
 from scipy.linalg.misc import norm
 import numpy.linalg
 import h5py
+import json
+
+jfile = file("arg.json")
+argument = json.load(jfile)
+
 logFile = raw_input('logFileName\n')
 lg.basicConfig(level=lg.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -17,11 +22,13 @@ lg.basicConfig(level=lg.DEBUG,
                 filename='./log/'+logFile,
                 filemode='w')
 #matFileName = u'./data/multiPie.mat'
-matFileName = u'../data/MultiPieGRAY.mat'
+
+threadhold = argument["threadhold"]
+matFileName = argument["matFileName"]
 data = h5py.File(matFileName)
 #data = sio.loadmat(matFileName)
 print np.shape(data['samples'])
-sketchNum = 40
+sketchNum = argument["sketchNum"]
 samples = np.array(data['samples']).transpose()
 [sampleNum,dataDim] = np.shape(samples)
 labels = np.array(data['label']).ravel()
@@ -31,14 +38,15 @@ labels = np.array(data['label']).ravel()
 print 'generate data begin!!!'
 lg.info('generate data begin!!!')
  
-proportion = 0.60
+proportion = argument["proportion"]
 index = range(sampleNum)
 selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
 trainSamples = np.matrix(samples[selectedIndex])
 trainLabels = labels[selectedIndex]
- 
-testIndex = selectedIndex
-testIndex = list(set(index) - set(selectedIndex))
+if argument["trainErr"]:
+    testIndex = selectedIndex
+else: 
+    testIndex = list(set(index) - set(selectedIndex))
  
 testSamples = np.matrix(samples[testIndex])
 testLabels = labels[testIndex]
@@ -46,7 +54,7 @@ testLabels = labels[testIndex]
 del index,samples,labels,data,selectedIndex,testIndex
  
 time1 = time.time()
-[Pieces, numberOfPieces, index] = sketchTrial(trainSamples, sketchNum)
+[Pieces, numberOfPieces, index] = sketchTrial(trainSamples, sketchNum,threadhold)
 psketchTrain = getSketch(trainSamples, Pieces, numberOfPieces, sketchNum)
 psketchTest = getSketch(testSamples, Pieces, numberOfPieces, sketchNum)
 sketchTime = time.time() - time1
@@ -60,7 +68,8 @@ print 'dn = ',norm(psketchTrain - originalSketchData,'fro')
 originalSketchTestData = testSamples * sketchM
 sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
- 
+
+print 'norm1111 = ',norm(sketchM*sketchM.transpose() - Pieces['rightSubspace'][0].transpose()*Pieces['rightSubspace'][0],'fro') 
 print 'norm = ',norm(sketchM.transpose()*sketchM - Pieces['rightSubspace'][0]*Pieces['rightSubspace'][0].transpose(),'fro')
 
 time1 = time.time()
@@ -101,10 +110,11 @@ psketchTime = time.time() - time1
  
  
 time1 = time.time()
-model = svm.SVC(kernel='linear',C=100.)
-model.fit(trainSamples,trainLabels)
-res = model.predict(testSamples)
-oAccuracy = sum(res == testLabels) / float(len(testLabels))
+#model = svm.SVC(kernel='linear',C=100.)
+#model.fit(trainSamples,trainLabels)
+#res = model.predict(testSamples)
+#oAccuracy = sum(res == testLabels) / float(len(testLabels))
+oAccuracy = 0
 # model = libsvmtrain(trainLabels, trainSamples)
 # [~, oAccuracy, ~] = libsvmpredict(testLabels, testSamples, model)
 otimes = time.time() - time1
