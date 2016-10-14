@@ -1,0 +1,7 @@
+*.swp
+*.md
+*.pyc
+log/
+data/
+log/*
+*.log

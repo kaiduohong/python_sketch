@@ -6,6 +6,7 @@ import random
 def randSimpleSketch(A, sketchRowNum):
     if type(A) != np.matrixlib.defmatrix.matrix:
         raise TypeError('A is not a matrix, type = ' + str(type(A)))
+    sketchRowNum = sketchRowNum * 2
     [n, m] = np.shape(A)
     proportion = 0.1
     index = random.sample(range(n),int(np.floor(n * proportion)))
@@ -34,5 +35,6 @@ def randSimpleSketch(A, sketchRowNum):
            B[sketchRowNum - zeroRowNum : sketchRowNum - (iter + zeroRowNum - n)] = A[iter : index]
         iter = iter + zeroRowNum + 1
 
-    [Null, Null, B] = np.linalg.svd(B, full_matrices=False)
+    [Null, S, B] = np.linalg.svd(B, full_matrices=False)
+    zeroRowNum = sum(S <= sys.float_info.epsilon)
     return B.transpose()

@@ -11,9 +11,11 @@ from scipy.linalg.misc import norm
 import numpy.linalg
 import h5py
 import json
+import pickle
 
 jfile = file("arg.json")
 argument = json.load(jfile)
+jfile.close()
 
 logFile = raw_input('logFileName\n')
 lg.basicConfig(level=lg.DEBUG,
@@ -24,6 +26,7 @@ lg.basicConfig(level=lg.DEBUG,
 #matFileName = u'./data/multiPie.mat'
 
 threadhold = argument["threadhold"]
+'''
 matFileName = argument["matFileName"]
 data = h5py.File(matFileName)
 #data = sio.loadmat(matFileName)
@@ -34,10 +37,23 @@ samples = np.array(data['samples']).transpose()
 labels = np.array(data['label']).ravel()
  
 #samples = np.insert(samples, dataDim, values= 1, axis=1)
- 
+''' 
+disp('loading')
+dataFile = open(argument,'r')
+data = pickle.load(dataFile)
+dataFile.close()
+trainSamples = data['trainSamples']
+trainLabels = data['trainLabels']
+testSamples = data['testSamples']
+testLabels = data['testLabels']
+
+
 print 'generate data begin!!!'
+
 lg.info('generate data begin!!!')
+'''
  
+data = {}
 proportion = argument["proportion"]
 index = range(sampleNum)
 selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
@@ -50,8 +66,18 @@ else:
  
 testSamples = np.matrix(samples[testIndex])
 testLabels = labels[testIndex]
+data['trainSamples'] = trainSamples
+data['trainLabels'] = trainLabels
+data['testSamples'] = testSamples
+data['testLabe'] = testLabels
+
+f = open('../data/data.dat','w')
+pickle.dump(data,f)
+dd = pickle.load(f)
+disp('done')
  
 del index,samples,labels,data,selectedIndex,testIndex
+'''
  
 time1 = time.time()
 [Pieces, numberOfPieces, index] = sketchTrial(trainSamples, sketchNum,threadhold)
@@ -78,12 +104,23 @@ randSketchTrainData = trainSamples * randSketch
 randSketchTestData = testSamples * randSketch
 randSketchTime = time.time() - time1
 lg.info('generate randSketch data time = ' + str(randSketchTime))
+
 time1 = time.time()
 [Null, Null, pcaM] = np.linalg.svd(trainSamples, full_matrices=False)
 pcaM = np.matrix(pcaM[0:sketchNum].transpose())
 pcaTrain = trainSamples * pcaM
 pcaTest = testSamples * pcaM
 pcaTime = time.time() - time1
+
+time1 = time.time()
+dataMean = np.mean(trainSamples,0)
+[Null,Null,centeredPcaM] = np.linalg.svd(trainSamples - dataMean,full_matrices=False)
+centeredPcaM = np.matrix(centeredPcaM[:sketchNum].transpose())
+centeredPcaTrain = (trainSample - dataMean) * centeredPcaM
+centeredPcaTest = (testSample - dataMean) * centeredPcaM
+centeredPcaTime = time.time() - time1
+
+
 lg.info('dataPca time = '+str(pcaTime))
 os.system('clear')
  
@@ -129,6 +166,15 @@ pcaAccuracy = sum(res == testLabels) / float(len(testLabels))
 print 'pcaSketch done!----------------------'
 lg.info('pcaSketch done!----------------------')
 pcaTime = time.time() - time1
+
+time1 = time.time()
+model = svm.SVC(kernel='linear',C=100.)
+model.fit(centeredPcaTrain,trainLabels)
+res = model.predict(centeredPcaTest)
+centeredPcaAccuracy = sum(res == testLabels) / float(len(testLabels))
+print 'centeredPca done!--------------------'
+lg.info('centeredPca done!--------------------')
+centeredPcaTime = time.time() - time1
  
  
 time1 = time.time()
@@ -147,3 +193,4 @@ lg.info('accuracy = '+ str(oAccuracy)+ '    time = '+ str(otimes))
 lg.info('pcaAccuracy = '+ str(pcaAccuracy)+ '    time = '+ str(pcaTime))
 lg.info('sketchAccuracy = '+ str(sketchAccuracy)+ '       time  = '+ str(sketchTime))
 lg.info('randSketchAccuracy = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchTime))
+lg.info('centeredPcaAccuracy= '+str(centeredPcaAccuracy) + ' time = ' = str(centeredPcaTime))
