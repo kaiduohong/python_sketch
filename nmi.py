@@ -36,6 +36,8 @@ def nmi(A, B): #两个列
         idBOccurCount = sum(B == idB)
 	Hy = Hy - (idBOccurCount / total) * math.log(idBOccurCount / total + sys.float_info.epsilon,2)
 
+    if Hx == 0 and Hy == 0:
+	return 1
     return 2 * MI / (Hx + Hy)
         
 if __name__=='__main__':

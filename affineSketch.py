@@ -1,4 +1,5 @@
 #-*- coding: UTF-8 -*-
+have not complete
 import numpy as np
 import sys
 from belongWhichPieces import *
@@ -19,6 +20,7 @@ def sketchTrial(data, sketchNum, threadhold):
 
     Pieces = {}
     Pieces['rightSubspace'] = []
+    Pieces['bias'] = []
 
     numberOfZeroRows = []
 
@@ -26,17 +28,21 @@ def sketchTrial(data, sketchNum, threadhold):
         if i % 1000 == 0:
             print 'sketchTrial_sketchIter = '+ str(i + 1)
 
-        belongsId = belongWhichPieces(data[i], Pieces, numberOfPieces, threadhold)
+        belongsId = belongWhichAff(data[i], Pieces, numberOfPieces, threadhold)
 
         if belongsId == -1:
             numberOfPieces = numberOfPieces + 1
             u = np.matrix(np.zeros([sketchNum,dataDim]))
             u[0] = data[i]
+	    Pieces['bias']['num'].append(1)
+	    Pieces['bias']['aff'].append(u)
             numberOfZeroRows.append(sketchNum - 1)
             Pieces['rightSubspace'].append(u)
-            Pieces['sigularValue'].append(s)
         else:
  	    Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
+	    n = Pieces['bias']['num']
+	    Pieces['bias']['aff'] = Pieces['bias']['aff'] * (n / float(n + 1)) + data[i] / float(n + 1)
+	
             zerosRowNum = numberOfZeroRows[belongsId]
             zerosRowNum = zerosRowNum - 1
             if zerosRowNum == 0:

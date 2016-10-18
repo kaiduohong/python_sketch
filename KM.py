@@ -12,32 +12,36 @@ class kuhn_Munkres(object):
 
     def __init__(self, weight):
 	[n,m] = np.shape(weight)
-	if n != m:
-	    raise Exception('n != m')
-	self.nodeNum = n
+	if n > m:
+	    raise Exception('n > m')
+	self.leftNodeNum = n
+	self.rightNodeNum = m
 	self.weight = np.array(weight,dtype = int)
 	self.Lx = np.array(np.zeros(n),dtype = int)
-	self.Ly = np.array(np.zeros(n),dtype = int)
-	self.left = np.array(np.zeros(n),dtype = int)
- 	self.slack = np.array(np.zeros(n),dtype=int)
+	self.Ly = np.array(np.zeros(m),dtype = int)
+	self.left = np.array(np.zeros(m),dtype = int)
+ 	self.slack = np.array(np.zeros(m),dtype=int)
 	self.s = np.array(np.zeros(n),dtype = bool)
-	self.t = np.array(np.zeros(n),dtype = bool)
+	self.t = np.array(np.zeros(m),dtype = bool)
 	 
-
-	
     def init(self):
-	for i in xrange(self.nodeNum):
+	for y in xrange(self.rightNodeNum):
+	    self.left[y] = -1
+	    self.Ly[y] = 0
+	#self.Ly[:] = 0
+	#self.left[:] = -1
+	#self.Lx[:] = 0
+	for i in xrange(self.leftNodeNum):
 	    self.Lx[i] = 0
-	    self.left[i] = -1	
-	    for j in xrange(self.nodeNum):
+	    for j in xrange(self.rightNodeNum):
 		self.Lx[i] = np.max([self.Lx[i],self.weight[i][j]])
-	for y in xrange(self.nodeNum):
-	    for x in xrange(self.nodeNum):
+	for y in xrange(self.rightNodeNum):
+	    for x in xrange(self.leftNodeNum):
 		self.slack[y] = np.min([self.Lx[x] - self.weight[x][y],self.slack[y]])
 	    
     def match(self,x):
 	self.s[x] = True
-	for y in xrange(self.nodeNum):
+	for y in xrange(self.rightNodeNum):
 	    if not self.t[y]:
 	        if self.Lx[x] + self.Ly[y] == self.weight[x][y]:
 		    self.t[y] = True
@@ -54,11 +58,11 @@ class kuhn_Munkres(object):
 
     def update(self):
 	a = sys.maxint
-	for y in xrange(self.nodeNum):
+	for y in xrange(self.rightNodeNum):
 	    if not self.t[y]:
 		a = min([a,self.slack[y]])
 	a = int(np.round(a))
-	for i in xrange(self.nodeNum):
+	for i in xrange(self.leftNodeNum):
 	    if self.s[i]:
 		self.Lx[i] -= a
 	    if self.t[i]:
@@ -66,17 +70,21 @@ class kuhn_Munkres(object):
 
     def KM(self):
  	self.init()	
-	for i in xrange(self.nodeNum):
+	for i in xrange(self.leftNodeNum):
 	    while(True):
-		for j in xrange(self.nodeNum):
-		    self.s[j] = self.t[j] = False
+		for j in xrange(self.rightNodeNum):
+		    self.t[j] = False
 		    self.slack[j] = sys.maxint
+		for j in xrange(self.leftNodeNum):
+		    self.s[j] = False
+
 		if self.match(i): break	
 		else: self.update()
 		
-	mat = np.array(np.zeros(self.nodeNum),dtype=int)
-	for i in xrange(self.nodeNum):
-	    mat[self.left[i]] = i
+	mat = np.array(np.zeros(self.leftNodeNum),dtype=int)
+	for i in xrange(self.rightNodeNum):
+	    if self.left[i] != -1:
+	    	mat[self.left[i]] = i
 	return mat
 	 
 

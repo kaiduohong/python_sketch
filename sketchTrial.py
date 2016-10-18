@@ -52,7 +52,7 @@ def sketchTrial(data, sketchNum, threadhold):
 
 	    numberOfZeroRows[belongsId] = zerosRowNum
 
-    for i in range(numberOfPieces)
+    for i in range(numberOfPieces):
         B = Pieces['rightSubspace'][i]
 	[Null,s,B]  = np.linalg.svd(B,full_matrices=False)
         zerosRowNum = sum(s <= sys.float_info.epsilon)

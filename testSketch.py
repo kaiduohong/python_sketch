@@ -12,6 +12,9 @@ import numpy.linalg
 import h5py
 import json
 import pickle
+import calNMI
+import spaceClustering
+import simpleSketchToAffineSpace
 
 jfile = file("arg.json")
 argument = json.load(jfile)
@@ -20,7 +23,7 @@ jfile.close()
 logFile = raw_input('logFileName\n')
 lg.basicConfig(level=lg.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                datefmt='%a,%d,%b,%Y,%H:%M:%S',
+                #datefmt='%a,%d,%b,%Y,%H:%M:%S',
                 filename='./log/'+logFile,
                 filemode='w')
 #matFileName = u'./data/multiPie.mat'
@@ -38,14 +41,17 @@ labels = np.array(data['label']).ravel()
  
 #samples = np.insert(samples, dataDim, values= 1, axis=1)
 ''' 
-disp('loading')
-dataFile = open(argument,'r')
+print 'loading'
+dataFile = open(argument,'rb')
 data = pickle.load(dataFile)
 dataFile.close()
 trainSamples = data['trainSamples']
 trainLabels = data['trainLabels']
 testSamples = data['testSamples']
 testLabels = data['testLabels']
+if np.min(trainLabels) != 0:
+    trainLabels -= np.min(trainLabels)
+    testLabels -= np.min(trainLabels)
 
 
 print 'generate data begin!!!'
@@ -95,6 +101,14 @@ originalSketchTestData = testSamples * sketchM
 sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
 
+time1 = time.time()
+[aff,affSketchM] = simpleSketchToAffineSpace(trainSamples,sketchNum)
+affSketchTrain = (trainSamples - aff) * affSketchM
+affSketchTest = (testSamples - aff) * affSketchM
+sketchToAffTime = time.time() - time1
+lg.info('generate affsketch time = '+ str(sketchToAffTime))
+
+
 print 'norm1111 = ',norm(sketchM*sketchM.transpose() - Pieces['rightSubspace'][0].transpose()*Pieces['rightSubspace'][0],'fro') 
 print 'norm = ',norm(sketchM.transpose()*sketchM - Pieces['rightSubspace'][0]*Pieces['rightSubspace'][0].transpose(),'fro')
 
@@ -134,7 +148,14 @@ randSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 randSketchTime = time.time() - time1
 print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
- 
+
+time1 = time.time()
+modelAffSketch = svm.SVC(kernel='linear',C=100.)
+modelAffSketch.fit(affSketchTrain,trainLabels) 
+res = modelAffSketch.predict(affSketchTest)
+affSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
+AffSketchTime = time.time() - time1
+
 time1 = time.time()
 modelpSketch = svm.SVC(kernel='linear',C=100.)
 modelpSketch.fit(psketchTrain,trainLabels)
@@ -185,12 +206,18 @@ sketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 print 'sketch done!--------------'
 lg.info('sketch done!--------------------')
 sketchTime = time.time() - time1
+
+time1 = time.time()
+classes = spaceClustering.clustering(trainSamples)
+nmi_cluster = calNMI.calNMI(classes,trainLabels)
+clusterTime = time.time() - time1
  
  
-lg.info('numberOfPieces = '+ str(numberOfPieces))
-lg.info('paccuracy = '+ str(pAccuracy)+ '    time = '+ str(psketchTime))
-lg.info('accuracy = '+ str(oAccuracy)+ '    time = '+ str(otimes))
-lg.info('pcaAccuracy = '+ str(pcaAccuracy)+ '    time = '+ str(pcaTime))
-lg.info('sketchAccuracy = '+ str(sketchAccuracy)+ '       time  = '+ str(sketchTime))
-lg.info('randSketchAccuracy = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchTime))
-lg.info('centeredPcaAccuracy= '+str(centeredPcaAccuracy) + ' time = ' = str(centeredPcaTime))
+lg.info('numberOfSubspaces = '+ str(numberOfPieces))
+lg.info('pacc = '+ str(pAccuracy)+ '    time = '+ str(psketchTime))
+lg.info('acc = '+ str(oAccuracy)+ '    time = '+ str(otimes))
+lg.info('pcaAcc = '+ str(pcaAccuracy)+ '    time = '+ str(pcaTime))
+lg.info('sketchAcc = '+ str(sketchAccuracy)+ ' time  = '+ str(sketchTime))
+lg.info('randSketchAcc = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchTime))
+lg.info('centeredPcaAcc= '+str(centeredPcaAccuracy) + ' time = ' + str(centeredPcaTime))
+lg.info('affSketchAcc= ' + str(affSketchAccuracy) + ' time = '+ str(affSketchTime))

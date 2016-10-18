@@ -34,7 +34,7 @@ data['trainLabels'] = trainLabels
 data['testSamples'] = testSamples                
 data['testLabe'] = testLabels                    
 fileName = 'multiPie_'+str(int(proportion * 100)) + '.dat'
-f = open('../data/data.dat','w+')        
+f = open('../data/data.dat','wb')        
 pickle.dump(data,f)
 print 'loading'
 dd = pickle.load(f)
