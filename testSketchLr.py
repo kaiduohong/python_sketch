@@ -15,6 +15,7 @@ import pickle
 import calNMIACC
 import spaceClustering
 from simpleSketchToAffineSpace import simpleSketchToAffineSpace
+from sklearn.linear_model import LogisticRegression
 
 jfile = file("arg.json")
 print jfile
@@ -143,7 +144,7 @@ os.system('clear')
 print 'begin to classify'
 lg.info('begin to classify!')
 time1 = time.time()
-modelRandSketch = svm.SVC(kernel='linear',C=100.)
+modelRandSketch = LogisticRegression()
 modelRandSketch.fit(randSketchTrainData,trainLabels)
 res = modelRandSketch.predict(randSketchTestData)
 randSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
@@ -152,14 +153,14 @@ print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 
 time1 = time.time()
-modelAffSketch = svm.SVC(kernel='linear',C=100.)
+modelAffSketch = LogisticRegression()
 modelAffSketch.fit(affSketchTrain,trainLabels) 
 res = modelAffSketch.predict(affSketchTest)
 affSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 AffSketchTime = time.time() - time1
 
 time1 = time.time()
-modelpSketch = svm.SVC(kernel='linear',C=100.)
+modelpSketch = LogisticRegression()
 modelpSketch.fit(psketchTrain,trainLabels)
 res = modelpSketch.predict(psketchTest)
 pAccuracy = sum(res == testLabels) / float(len(testLabels))
@@ -170,19 +171,18 @@ psketchTime = time.time() - time1
  
  
 time1 = time.time()
-#model = svm.SVC(kernel='linear',C=100.)
-#model.fit(trainSamples,trainLabels)
-#res = model.predict(testSamples)
-#oAccuracy = sum(res == testLabels) / float(len(testLabels))
+model =LogisticRegression() 
+model.fit(trainSamples,trainLabels)
+res = model.predict(testSamples)
+oAccuracy = sum(res == testLabels) / float(len(testLabels))
 oAccuracy = 0
-# model = libsvmtrain(trainLabels, trainSamples)
-# [~, oAccuracy, ~] = libsvmpredict(testLabels, testSamples, model)
+
 otimes = time.time() - time1
 print 'o done---------------------------'
 lg.info('o done!----------------------------')
  
 time1 = time.time()
-model = svm.SVC(kernel='linear',C=100.)
+model =LogisticRegression() 
 model.fit(pcaTrain,trainLabels)
 res = model.predict(pcaTest)
 pcaAccuracy = sum(res == testLabels) / float(len(testLabels))
@@ -191,7 +191,7 @@ lg.info('pcaSketch done!----------------------')
 pcaTime = time.time() - time1
 
 time1 = time.time()
-model = svm.SVC(kernel='linear',C=100.)
+model =LogisticRegression()
 model.fit(centeredPcaTrain,trainLabels)
 res = model.predict(centeredPcaTest)
 centeredPcaAccuracy = sum(res == testLabels) / float(len(testLabels))
@@ -201,7 +201,7 @@ centeredPcaTime = time.time() - time1
  
  
 time1 = time.time()
-model = svm.SVC(kernel='linear',C=100.)
+model = LogisticRegression()
 model.fit(originalSketchData,trainLabels)
 res = model.predict(originalSketchTestData)
 sketchAccuracy = sum(res == testLabels) / float(len(testLabels))

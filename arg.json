@@ -3,6 +3,6 @@
     "proportion": 0.1, 
     "sketchNum": 55, 
     "threadhold": 0.70, 
-    "trainErr": True,
+    "trainErr": true,
     "dataFile": "../data/data1_1.dat"
 }

@@ -23,7 +23,7 @@ selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
 
 trainSamples = np.matrix(samples[selectedIndex]) 
 trainLabels = labels[selectedIndex]              
-if argument['train'] == False:
+if argument['trainErr'] == False:
     testIndex = list(set(index) - set(selectedIndex))          
 else:
     testIndex = selectedIndex
@@ -37,7 +37,7 @@ data['trainLabels'] = trainLabels
 data['testSamples'] = testSamples                
 data['testLabels'] = testLabels                    
 fileName = 'multiPie_'+str(int(proportion * 100)) + '.dat'
-f = open(argument['datafile'],'wb')        
+f = open(argument['dataFile'],'wb')        
 pickle.dump(data,f)
 print 'loading'
 print 'done'
