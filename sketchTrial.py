@@ -34,8 +34,8 @@ def sketchTrial(data, sketchNum, threadhold):
             u[0] = data[i]
             numberOfZeroRows.append(sketchNum - 1)
             Pieces['rightSubspace'].append(u)
-            Pieces['sigularValue'].append(s)
         else:
+   	    zerosRowNum = numberOfZeroRows[belongsId]
  	    Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
             zerosRowNum = numberOfZeroRows[belongsId]
             zerosRowNum = zerosRowNum - 1
@@ -56,6 +56,6 @@ def sketchTrial(data, sketchNum, threadhold):
         B = Pieces['rightSubspace'][i]
 	[Null,s,B]  = np.linalg.svd(B,full_matrices=False)
         zerosRowNum = sum(s <= sys.float_info.epsilon)
-        Pices['rightSubspace'][i] = B[0:sketchNum - zerosRowNum]
+        Pieces['rightSubspace'][i] = B[0:sketchNum/2]
 
     return Pieces,numberOfPieces,index

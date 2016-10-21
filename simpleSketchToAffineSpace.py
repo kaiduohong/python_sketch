@@ -25,7 +25,7 @@ def simpleSketchToAffineSpace(A, sketchRowNum):
         zeroRowNum = sum(S <= sys.float_info.epsilon)
 
         index = min(iter + zeroRowNum, n)
-	aff = aff * iter / index + sum(A[iter:idex]) / index
+	aff = aff * iter / index + sum(A[iter:index]) / index
         if iter + zeroRowNum <= n:
            B[sketchRowNum - zeroRowNum : sketchRowNum] = A[iter : index] - aff
         else:
@@ -35,6 +35,6 @@ def simpleSketchToAffineSpace(A, sketchRowNum):
 
     [Null, S, B] = np.linalg.svd(B, full_matrices=False)
     zeroRowNum = sum(S <= sys.float_info.epsilon)
-    B = B[:sketchRowNum - zeroRowNum]
+    B = B[:sketchRowNum/2]
     
-    return [aff,B.transpose()]
+    return aff,B.transpose()

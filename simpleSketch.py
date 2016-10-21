@@ -33,6 +33,6 @@ def simpleSketch(A, sketchRowNum):
 
     [Null, S, B] = np.linalg.svd(B, full_matrices=False)
     zeroRowNum = sum(S <= sys.float_info.epsilon)
-    B = B[:sketchRowNum - zeroRowNum]
+    B = B[:sketchRowNum/2]
     
     return B.transpose()

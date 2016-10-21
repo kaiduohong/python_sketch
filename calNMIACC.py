@@ -36,9 +36,10 @@ def calNMI(plabels,olabels):
 	    		
     km = KM.kuhn_Munkres(weight)
     mat = km.KM()
-    plabels = mat[plabels]
+    plabels = np.ndarray.astype(mat[plabels],int)
+    acc = sum(plabels == olabels) / float(len(plabels))
     NMI = nmi.nmi(plabels,olabels)
-    return NMI
+    return acc,NMI
 
 
 if __name__ == '__main__':
