@@ -212,7 +212,7 @@ sketchTime = time.time() - time1
 lg.info('begin cluster')
 print 'begin cluster'
 time1 = time.time()
-classes = spaceClustering.clustering(trainSamples)
+classes = spaceClustering.clustering(trainSamples,sketchNum,threadhold)
 acc,nmi_cluster = calNMIACC.calNMIACC(classes,trainLabels)
 clusterTime = time.time() - time1
 

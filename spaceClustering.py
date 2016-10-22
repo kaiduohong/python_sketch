@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from belongWhichPieces import *
 from scipy.linalg.misc import norm
-def clustering(data, sketchNum, threadhold):
+def clustering(data,sketchNum,threadhold):
     if type(data) != np.matrixlib.defmatrix.matrix:
         raise TypeError('data is not a matrix, type = ' + str(type(data)))
 
@@ -36,8 +36,8 @@ def clustering(data, sketchNum, threadhold):
             u[0] = data[i]
             numberOfZeroRows.append(sketchNum - 1)
             Pieces['rightSubspace'].append(u)
-            Pieces['sigularValue'].append(s)
         else:
+	    zerosRowNum = numberOfZeroRows[belongsId]
 	    classes[i] = belongsId
  	    Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
             zerosRowNum = numberOfZeroRows[belongsId]
@@ -54,11 +54,12 @@ def clustering(data, sketchNum, threadhold):
                 Pieces['rightSubspace'][belongsId]=B[:sketchNum]
 
 	    numberOfZeroRows[belongsId] = zerosRowNum
-
+    '''
     for i in range(numberOfPieces):
         B = Pieces['rightSubspace'][i]
 	[Null,s,B]  = np.linalg.svd(B,full_matrices=False)
         zerosRowNum = sum(s <= sys.float_info.epsilon)
-        Pices['rightSubspace'][i] = B[0:sketchNum - zerosRowNum]
+        Pices['rightSubspace'][i] = B[0:sketchNum/2]
+    '''
 
     return classes
