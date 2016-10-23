@@ -140,6 +140,19 @@ centeredPcaTime = time.time() - time1
 
 lg.info('dataPca time = '+str(pcaTime))
 os.system('clear')
+'''should be move'''
+lg.info('begin cluster')
+print 'begin cluster'
+time1 = time.time()
+classes = spaceClustering.clustering(trainSamples,sketchNum,threadhold)
+acc,nmi_cluster = calNMIACC.calNMIACC(classes,trainLabels)
+clusterTime = time.time() - time1
+
+lg.info('cluster acc = '+ str(acc)+'   time= '+ str(clusterTime))
+lg.info(' ')
+
+
+
  
 print 'begin to classify'
 lg.info('begin to classify!')

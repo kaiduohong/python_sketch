@@ -2,13 +2,13 @@ import numpy as np
 import KM
 import nmi
 
-def calNMI(plabels,olabels):
+def calNMIACC(plabels,olabels):
     if len(olabels) != len(plabels):
 	raise Exception('len of labels not the same')
     if type(olabels) != np.ndarray:
-	olabels = np.array(olabels)
+	olabels = np.array(olabels,int)
     if type(plabels) != np.ndarray:
-	plabels = np.array(plabels) 
+	plabels = np.array(plabels,int) 
 
     #calculate the weight
     uniqueOlabels = np.unique(olabels)
@@ -19,7 +19,7 @@ def calNMI(plabels,olabels):
     for (i,uo) in enumerate(uniqueOlabels):
 	olabels[olabels == uo] = i
     for (i,up) in enumerate(uniquePlabels):
-	plabels[plabels == up] = i
+	plabels[plabels == up] = int(i)
 
 	
     
@@ -45,5 +45,5 @@ def calNMI(plabels,olabels):
 if __name__ == '__main__':
     a=[1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3]
     b=[1,2,1,1,1,1,1,2,2,2,2,3,1,1,3,3,3]
-    v = calNMI(a,b)
+    v = calNMIACC(a,b)
     print v
