@@ -155,7 +155,6 @@ randSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 randSketchTime = time.time() - time1
 print 'randacc = ',randSketchAccuracy
 lg.info(randSketchAccuracy)
-raw_input('pause')
 print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 
@@ -164,6 +163,8 @@ modelAffSketch = LogisticRegression()
 modelAffSketch.fit(affSketchTrain,trainLabels) 
 res = modelAffSketch.predict(affSketchTest)
 affSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
+print 'affSketchAcc = ',affSketchAccuracy
+lg.info('affSketchAcc = ' + str(affSketchAccuracy))
 AffSketchTime = time.time() - time1
 
 time1 = time.time()
