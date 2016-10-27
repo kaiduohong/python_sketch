@@ -11,6 +11,7 @@ def simpleSketchToAffineSpace(A, sketchRowNum):
     zeroRowNum = sketchRowNum
     iter = 0
     aff = np.zeros(m) 
+
     while iter < n:
         if iter % 1000 == 0:
             print 'simpleSketch_sketchIter = '+ str(iter)

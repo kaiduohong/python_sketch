@@ -27,21 +27,10 @@ lg.basicConfig(level=lg.DEBUG,
                 #datefmt='%a,%d,%b,%Y,%H:%M:%S',
                 filename='./log/'+logFile,
                 filemode='w')
-#matFileName = u'./data/multiPie.mat'
 
 threadhold = argument["threadhold"]
 sketchNum = argument["sketchNum"]
-'''
-matFileName = argument["matFileName"]
-data = h5py.File(matFileName)
-#data = sio.loadmat(matFileName)
-print np.shape(data['samples'])
-samples = np.array(data['samples']).transpose()
-[sampleNum,dataDim] = np.shape(samples)
-labels = np.array(data['label']).ravel()
- 
-#samples = np.insert(samples, dataDim, values= 1, axis=1)
-''' 
+
 print 'loading'
 dataFile = open(argument['dataFile'],'rb')
 data = pickle.load(dataFile)
@@ -52,16 +41,28 @@ trainLabels = data['trainLabels']
 testSamples = data['testSamples']
 testLabels = data['testLabels']
 if np.min(trainLabels) != 0:
-    trainLabels -= np.min(trainLabels)
-    testLabels -= np.min(trainLabels)
+    minimum = np.min(trainLabels)
+    print 'minimun = ',minumum
+    trainLabels -= minimum
+    testLabels -= minimum
+print 'size of trainLabels = ',np.shape(trainLabels)
 
 
 print 'generate data begin!!!'
-
 lg.info('generate data begin!!!')
 '''
+
+matFileName = u'./data/multiPie.mat'
+matFileName = argument["matFileName"]
+data = h5py.File(matFileName)
+#data = sio.loadmat(matFileName)
+print np.shape(data['samples'])
+samples = np.array(data['samples']).transpose()
+[sampleNum,dataDim] = np.shape(samples)
+labels = np.array(data['label']).ravel()
  
-data = {}
+#samples = np.insert(samples, dataDim, values= 1, axis=1)
+ 
 proportion = argument["proportion"]
 index = range(sampleNum)
 selectedIndex = random.sample(index,int(np.floor(sampleNum * proportion)))
@@ -74,17 +75,9 @@ else:
  
 testSamples = np.matrix(samples[testIndex])
 testLabels = labels[testIndex]
-data['trainSamples'] = trainSamples
-data['trainLabels'] = trainLabels
-data['testSamples'] = testSamples
-data['testLabe'] = testLabels
 
-f = open('../data/data.dat','w')
-pickle.dump(data,f)
-dd = pickle.load(f)
-disp('done')
  
-del index,samples,labels,data,selectedIndex,testIndex
+del index,samples,labels,selectedIndex,testIndex
 '''
  
 time1 = time.time()
@@ -107,10 +100,10 @@ time1 = time.time()
 aff,affSketchM = simpleSketchToAffineSpace(trainSamples,sketchNum)
 affSketchTrain = (trainSamples - aff) * affSketchM
 affSketchTest = (testSamples - aff) * affSketchM
-sketchToAffTime = time.time() - time1
-lg.info('generate affsketch time = '+ str(sketchToAffTime))
+affSketchTime = time.time() - time1
+lg.info('generate affsketch time = '+ str(affSketchTime))
 
-
+print np.shape(sketchM*sketchM.transpose()), np.shape(Pieces['rightSubspace'][0].transpose() * Pieces['rightSubspace'][0])
 print 'norm1111 = ',norm(sketchM*sketchM.transpose() - Pieces['rightSubspace'][0].transpose()*Pieces['rightSubspace'][0],'fro') 
 print 'norm = ',norm(sketchM.transpose()*sketchM - Pieces['rightSubspace'][0]*Pieces['rightSubspace'][0].transpose(),'fro')
 
@@ -148,6 +141,9 @@ modelRandSketch.fit(randSketchTrainData,trainLabels)
 res = modelRandSketch.predict(randSketchTestData)
 randSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 randSketchTime = time.time() - time1
+#should be removed
+print randSketchAccuracy
+lg.info(randSketchAccuracy)
 print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 

@@ -2,7 +2,7 @@
 have not complete
 import numpy as np
 import sys
-from belongWhichPieces import *
+from belongWhichAff import *
 from scipy.linalg.misc import norm
 def sketchTrial(data, sketchNum, threadhold):
     if type(data) != np.matrixlib.defmatrix.matrix:
@@ -21,6 +21,7 @@ def sketchTrial(data, sketchNum, threadhold):
     Pieces = {}
     Pieces['rightSubspace'] = []
     Pieces['bias'] = []
+    dataTemp = []
 
     numberOfZeroRows = []
 
@@ -31,22 +32,24 @@ def sketchTrial(data, sketchNum, threadhold):
         belongsId = belongWhichAff(data[i], Pieces, numberOfPieces, threadhold)
 
         if belongsId == -1:
-            numberOfPieces = numberOfPieces + 1
             u = np.matrix(np.zeros([sketchNum,dataDim]))
             u[0] = data[i]
 	    Pieces['bias']['num'].append(1)
 	    Pieces['bias']['aff'].append(u)
             numberOfZeroRows.append(sketchNum - 1)
-            Pieces['rightSubspace'].append(u)
+            dataTemp.append(u)
+            Pieces['rightSubspace'].append(u / norm(u,'fro'))
+            numberOfPieces = numberOfPieces + 1
         else:
- 	    Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
+	    dataTemp[sketchNum - zerosRowNum] = data[i]
+ 	    #Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
 	    n = Pieces['bias']['num']
 	    Pieces['bias']['aff'] = Pieces['bias']['aff'] * (n / float(n + 1)) + data[i] / float(n + 1)
 	
             zerosRowNum = numberOfZeroRows[belongsId]
             zerosRowNum = zerosRowNum - 1
             if zerosRowNum == 0:
-                B = Pieces['rightSubspace'][belongsId]
+                B = dataTemp[belongsId]#Pieces['rightSubspace'][belongsId]
                 [Null,s,u] = np.linalg.svd(B,full_matrices=False)
                 delta = np.power(s[int(np.floor((sketchNum + 1) / 2))], 2)
                 s = s**2 - delta
@@ -54,12 +57,13 @@ def sketchTrial(data, sketchNum, threadhold):
                 s = np.sqrt(s)
                 zerosRowNum = sum(s <= sys.float_info.epsilon)
                 B = np.matrix(np.diag(s)) * u
-                Pieces['rightSubspace'][belongsId]=B[:sketchNum]
+                Pieces['rightSubspace'][belongsId] = u[:sketchNum]
+                dataTemp = B[:sketchNum]
 
 	    numberOfZeroRows[belongsId] = zerosRowNum
 
     for i in range(numberOfPieces)
-        B = Pieces['rightSubspace'][i]
+        B = dataTemp[i]
 	[Null,s,B]  = np.linalg.svd(B,full_matrices=False)
         zerosRowNum = sum(s <= sys.float_info.epsilon)
         Pices['rightSubspace'][i] = B[0:sketchNum - zerosRowNum]

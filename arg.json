@@ -1,8 +1,8 @@
 {
     "matFileName": "../data/MultiPieGRAY.mat", 
     "proportion": 0.01, 
-    "sketchNum": 55, 
+    "sketchNum": 40, 
     "threadhold": 0.70, 
     "trainErr": true,
-    "dataFile": "../data/data_1perto1oer_test.dat"
+    "dataFile": "../data/data.dat"
 }

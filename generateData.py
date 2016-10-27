@@ -12,7 +12,7 @@ matFileName = argument["matFileName"]
 data = h5py.File(matFileName) 
 
 print 'begin'
-sketchNum = argument["sketchNum"]
+#sketchNum = argument["sketchNum"]
 samples = np.array(data['samples']).transpose()
 [sampleNum,dataDim] = np.shape(samples)
 labels = np.array(data['label']).ravel()

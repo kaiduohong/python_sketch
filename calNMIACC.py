@@ -5,10 +5,10 @@ import nmi
 def calNMIACC(plabels,olabels):
     if len(olabels) != len(plabels):
 	raise Exception('len of labels not the same')
-    if type(olabels) != np.ndarray:
-	olabels = np.array(olabels,int)
-    if type(plabels) != np.ndarray:
-	plabels = np.array(plabels,int) 
+    if len(plabels) == 0:
+	raise Exception('len of labels is not the same')
+    olabels = np.array(olabels,int)
+    plabels = np.array(plabels,int) 
 
     #calculate the weight
     uniqueOlabels = np.unique(olabels)
@@ -19,6 +19,8 @@ def calNMIACC(plabels,olabels):
     for (i,uo) in enumerate(uniqueOlabels):
 	olabels[olabels == uo] = i
     for (i,up) in enumerate(uniquePlabels):
+	print up
+        print sum(plabels == up) 
 	plabels[plabels == up] = int(i)
 
 	

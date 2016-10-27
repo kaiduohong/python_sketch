@@ -23,6 +23,8 @@ argument = json.load(jfile)
 jfile.close()
 
 logFile = raw_input('logFileName\n')
+logf = open(logFile,'w')
+logf.close()
 lg.basicConfig(level=lg.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 #datefmt='%a,%d,%b,%Y,%H:%M:%S',
@@ -52,6 +54,7 @@ trainSamples = data['trainSamples']
 trainLabels = data['trainLabels']
 testSamples = data['testSamples']
 testLabels = data['testLabels']
+print testLabels
 if np.min(trainLabels) != 0:
     trainLabels -= np.min(trainLabels)
     testLabels -= np.min(trainLabels)
@@ -108,8 +111,8 @@ time1 = time.time()
 aff,affSketchM = simpleSketchToAffineSpace(trainSamples,sketchNum)
 affSketchTrain = (trainSamples - aff) * affSketchM
 affSketchTest = (testSamples - aff) * affSketchM
-sketchToAffTime = time.time() - time1
-lg.info('generate affsketch time = '+ str(sketchToAffTime))
+affSketchTime = time.time() - time1
+lg.info('generate affsketch time = '+ str(affSketchTime))
 
 
 print 'norm1111 = ',norm(sketchM*sketchM.transpose() - Pieces['rightSubspace'][0].transpose()*Pieces['rightSubspace'][0],'fro') 
@@ -140,28 +143,19 @@ centeredPcaTime = time.time() - time1
 
 lg.info('dataPca time = '+str(pcaTime))
 os.system('clear')
-'''should be move'''
-lg.info('begin cluster')
-print 'begin cluster'
-time1 = time.time()
-classes = spaceClustering.clustering(trainSamples,sketchNum,threadhold)
-acc,nmi_cluster = calNMIACC.calNMIACC(classes,trainLabels)
-clusterTime = time.time() - time1
-
-lg.info('cluster acc = '+ str(acc)+'   time= '+ str(clusterTime))
-lg.info(' ')
-
-
-
  
 print 'begin to classify'
 lg.info('begin to classify!')
+
 time1 = time.time()
-modelRandSketch = LogisticRegression()
+modelRandSketch = LogisticRegression(max_iter=1000)
 modelRandSketch.fit(randSketchTrainData,trainLabels)
 res = modelRandSketch.predict(randSketchTestData)
 randSketchAccuracy = sum(res == testLabels) / float(len(testLabels))
 randSketchTime = time.time() - time1
+print 'randacc = ',randSketchAccuracy
+lg.info(randSketchAccuracy)
+raw_input('pause')
 print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 

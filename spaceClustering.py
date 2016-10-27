@@ -20,6 +20,7 @@ def clustering(data,sketchNum,threadhold):
 
     Pieces = {}
     Pieces['rightSubspace'] = []
+    dataTemp = []
 
     numberOfZeroRows = []
 
@@ -30,20 +31,23 @@ def clustering(data,sketchNum,threadhold):
         belongsId = belongWhichPieces(data[i], Pieces, numberOfPieces, threadhold)
 
         if belongsId == -1:
-            numberOfPieces = numberOfPieces + 1
 	    classes[i] = numberOfPieces
-            u = np.matrix(np.zeros([sketchNum,dataDim]))
+            dataTemp.append(np.zeros([sketchNum,dataDim]))
+	    u = np.matrix(np.zeros([sketchNum,dataDim]))
             u[0] = data[i]
             numberOfZeroRows.append(sketchNum - 1)
-            Pieces['rightSubspace'].append(u)
+            Pieces['rightSubspace'].append(u / norm(u,'fro'))
+	    dataTemp.append(u)
+            numberOfPieces = numberOfPieces + 1
         else:
 	    zerosRowNum = numberOfZeroRows[belongsId]
 	    classes[i] = belongsId
- 	    Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
+            dataTemp[belongsId][sketchNum - zerosRowNum] = data[i]
+ 	    #Pieces['rightSubspace'][belongsId][sketchNum - zerosRowNum] = data[i]
             zerosRowNum = numberOfZeroRows[belongsId]
             zerosRowNum = zerosRowNum - 1
             if zerosRowNum == 0:
-                B = Pieces['rightSubspace'][belongsId]
+                B = dataTemp[belongsId]
                 [Null,s,u] = np.linalg.svd(B,full_matrices=False)
                 delta = np.power(s[int(np.floor((sketchNum + 1) / 2))], 2)
                 s = s**2 - delta
@@ -51,7 +55,8 @@ def clustering(data,sketchNum,threadhold):
                 s = np.sqrt(s)
                 zerosRowNum = sum(s <= sys.float_info.epsilon)
                 B = np.matrix(np.diag(s)) * u
-                Pieces['rightSubspace'][belongsId]=B[:sketchNum]
+                Pieces['rightSubspace'][belongsId] = u[:sketchNum]
+		dataTemp[belongsId] = B[:sketchNum]
 
 	    numberOfZeroRows[belongsId] = zerosRowNum
     '''
