@@ -56,8 +56,9 @@ testSamples = data['testSamples']
 testLabels = data['testLabels']
 print testLabels
 if np.min(trainLabels) != 0:
-    trainLabels -= np.min(trainLabels)
-    testLabels -= np.min(trainLabels)
+    minimum = np.min(trainLabels)
+    trainLabels -= minimum
+    testLabels -= minimum
 
 
 print 'generate data begin!!!'

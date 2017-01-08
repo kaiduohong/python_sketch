@@ -19,8 +19,6 @@ def calNMIACC(plabels,olabels):
     for (i,uo) in enumerate(uniqueOlabels):
 	olabels[olabels == uo] = i
     for (i,up) in enumerate(uniquePlabels):
-	print up
-        print sum(plabels == up) 
 	plabels[plabels == up] = int(i)
 
 	
