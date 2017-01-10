@@ -1,10 +1,13 @@
 #-*-coding:utf-8 -*-
+import os
+os.system('rm *.pyc')
+
 import time
 import os
 from sklearn import svm
 from simpleSketch import *
-from sketchTrial import  *
-from getSketch import *
+#from sketchTrial import  *
+#from getSketch import *
 #import scipy.io as sio
 from simpleSketchWithRandom import *
 #from belongWhichPieces import *
@@ -13,10 +16,19 @@ import numpy.linalg
 import h5py
 import json
 import pickle
-import calNMIACC
-import spaceClustering
+#import calNMIACC
+##import spaceClustering
 from simpleSketchToAffineSpace import simpleSketchToAffineSpace
-import getPCA
+from getPCAData import getPCAData
+from svmTest import svmTest
+
+'''
+reload(getPCAData)
+reload(svmTest)
+reload(simpleSketch)
+reload(simpleSketchWithRandom)
+reload(simpleSketchToAffineSpace)
+'''
 
 jfile = file("arg.json")
 print jfile
@@ -92,13 +104,22 @@ psketchTest = getSketch(testSamples, Pieces, numberOfPieces, sketchNum)
 sketchTime = time.time() - time1
 lg.info('genetate sketch time = '+str(sketchTime))
 '''
- 
+
+#原来的sketch方法 
 time1 = time.time()
 sketchM = simpleSketch(trainSamples, sketchNum)
 [originalSketchData,originalSketchTestData] = getSimpleSketchData(trainSamples,testSamples,sketchM)
 sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
 
+#加权sketch
+time1 = time.time()
+sketchM = weightSimpleSketch(trainSamples, sketchNum)
+[weightSketchTrain,weightSketchTest] = getWeightSimpleSketchData(trainSamples,testSamples,sketchM)
+wegihtSketchT = time.time() - time1
+lg.info('generate weightSketch time = '+str(weightSketchT))
+
+#带平移中心化的sketch
 time1 = time.time()
 aff,affSketchM = simpleSketchToAffineSpace(trainSamples,sketchNum)
 affSketchTrain = (trainSamples - aff) * affSketchM
@@ -107,6 +128,7 @@ affSketchTime = time.time() - time1
 lg.info('generate affsketch time = '+ str(affSketchTime))
 
 
+#rand Sketch
 time1 = time.time()
 randSketch = randSimpleSketch(trainSamples, sketchNum)
 randSketchTrainData = trainSamples * randSketch
@@ -114,12 +136,14 @@ randSketchTestData = testSamples * randSketch
 randSketchTime = time.time() - time1
 lg.info('generate randSketch data time = ' + str(randSketchTime))
 
+#pca
 time1 = time.time()
-[pcaM,pcaTrain,pcaTest] = getPCAData(trainSamples,testSanokes,sketchNum)
+[pcaM,pcaTrain,pcaTest] = getPCAData(trainSamples,testSamples,sketchNum)
 pcaTime = time.time() - time1
 
+#centered PCA
 time1 = time.time()
-[centeredPcaM,centeredPcaTrain,centeredPcaTest] = getPCAData(trainSamples,testSamples,dim,True)
+[centeredPcaM,centeredPcaTrain,centeredPcaTest] = getPCAData(trainSamples,testSamples,sketchNum,True)
 centeredPcaTime = time.time() - time1
 
 lg.info('dataPca time = '+str(pcaTime))
@@ -128,7 +152,7 @@ os.system('clear')
 print 'begin to classify'
 lg.info('begin to classify!')
 time1 = time.time()
-randSjetchAccuracy = svmTest(randSketchTrainData,trainLabels,randSketchTestData,testLabels,'linear',100.)
+randSketchAccuracy = svmTest(randSketchTrainData,trainLabels,randSketchTestData,testLabels,'linear',100.)
 randSketchTime = time.time() - time1
 #should be removed
 print randSketchAccuracy
@@ -137,29 +161,32 @@ print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 
 
+#带平移的sketch
 time1 = time.time()
 affSketchAccuracy = svmTest(affSketchTrain,trainLabels,affSketchTest,testLabels,'linear',100.)
 AffSketchTime = time.time() - time1
 
+'''
 time1 = time.time()
 pAccuracy = svmTest(psketchTrain,trainLabels,psketchTest,testLabels,'linear',100.)
  
 print 'mutiSubspace sketch done!-----------'
 lg.info('pskech done!----------------------')
 psketchTime = time.time() - time1
- 
+'''
  
 time1 = time.time()
-#model = svm.SVC(kernel='linear',C=100.)
-#model.fit(trainSamples,trainLabels)
-#res = model.predict(testSamples)
-#oAccuracy = sum(res == testLabels) / float(len(testLabels))
-oAccuracy = 0
-# model = libsvmtrain(trainLabels, trainSamples)
-# [~, oAccuracy, ~] = libsvmpredict(testLabels, testSamples, model)
+oAccuracy = svmTest(trainSamples,trainLabels,testSamples,testLabels,'linear',100.)
+#oAccuracy = 0
 otimes = time.time() - time1
 print 'o done---------------------------'
 lg.info('o done!----------------------------')
+
+time1 = time.time()
+weightSketchAccuracy = svmTest(trainSamples, trainLabels, testSamples,testLabels,'linear',100.)
+wtimes = times.times() - time1
+print 'weightSketch done!-------------------------'
+lg.info('weightSketch done!-------------------------')
  
 time1 = time.time()
 pcaAccuracy = svmTest(pcaTrain,trainLabels,pcaTest,testLabels,'linear',100.)
@@ -168,7 +195,7 @@ lg.info('pcaSketch done!----------------------')
 pcaTime = time.time() - time1
 
 time1 = time.time()
-centeredPcaAccuracy = svmTest(centeredPcaTrain,trainLabels,centeredPcaTest,testLabels)
+centeredPcaAccuracy = svmTest(centeredPcaTrain,trainLabels,centeredPcaTest,testLabels,'linear',100.)
 print 'centeredPca done!--------------------'
 lg.info('centeredPca done!--------------------')
 centeredPcaTime = time.time() - time1
@@ -199,5 +226,6 @@ lg.info('acc = '+ str(oAccuracy)+ '    time = '+ str(otimes))
 lg.info('pcaAcc = '+ str(pcaAccuracy)+ '    time = '+ str(pcaTime))
 lg.info('sketchAcc = '+ str(sketchAccuracy)+ ' time  = '+ str(sketchTime))
 lg.info('randSketchAcc = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchTime))
+lg.info('weightSketchAcc = '+str(weightSketchAccuracy)+' time = '+str(weightSketchT))
 lg.info('centeredPcaAcc= '+str(centeredPcaAccuracy) + ' time = ' + str(centeredPcaTime))
 lg.info('affSketchAcc= ' + str(affSketchAccuracy) + ' time = '+ str(affSketchTime))

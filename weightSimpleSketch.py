@@ -5,14 +5,14 @@ import sys
 import logging as lg
 
 #产生降维数据
-def getSimpleSketchData(samples,testSamples,sketchM):
+def getWeightSimpleSketchData(samples,testSamples,sketchM):
     sketchTrainData = samples * sketchM
     sketchTestData = testSamples * sketchM
     return sketchTrainData,sketchTestData
     
     
 #这是原始的simpleSketch 算法
-def simpleSketch(A, sketchRowNum):
+def weightSimpleSketch(A, sketchRowNum, weight = 0.8):
     #输入为矩阵，以行排列
     if type(A) != np.matrixlib.defmatrix.matrix:
         raise TypeError('A is not a matrix, type = ' + str(type(A)))
@@ -41,9 +41,9 @@ def simpleSketch(A, sketchRowNum):
 
         index = min(iter + zeroRowNum, n)
         if iter + zeroRowNum <= n:
-           B[sketchRowNum - zeroRowNum : sketchRowNum] = A[iter : index]
+           B[sketchRowNum - zeroRowNum : sketchRowNum] = weight * A[iter : index]
         else:
-           B[sketchRowNum - zeroRowNum : sketchRowNum - (iter + zeroRowNum - n)] = A[iter : index]
+           B[sketchRowNum - zeroRowNum : sketchRowNum - (iter + zeroRowNum - n)] = weight * A[iter : index]
         iter = iter + zeroRowNum + 1
  
 

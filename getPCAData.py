@@ -1,4 +1,5 @@
 #-*-coding:utf-8-*-
+import numpy as np
 
 def getPCAData(trainSamples,testSamples,dim,centered = False):
     dataMean = .0
@@ -6,8 +7,8 @@ def getPCAData(trainSamples,testSamples,dim,centered = False):
         dataMean = np.mean(trainSamples,0)
 
     [Null,Null,centeredPcaM] = np.linalg.svd(trainSamples - dataMean,full_matrices=False)
-    centeredPcaM = np.matrix(centeredPcaM[:sketchNum].transpose())
+    centeredPcaM = np.matrix(centeredPcaM[:dim].transpose())
     centeredPcaTrain = (trainSamples - dataMean) * centeredPcaM
     centeredPcaTest = (testSamples - dataMean) * centeredPcaM
     print 'datamean = ',dataMean
-    return centeredPcaM,pcaTrain,pcaTest
+    return centeredPcaM,centeredPcaTrain,centeredPcaTest
