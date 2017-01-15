@@ -10,6 +10,7 @@ from simpleSketch import *
 #from getSketch import *
 #import scipy.io as sio
 from simpleSketchWithRandom import *
+from weightSimpleSketch import *
 #from belongWhichPieces import *
 from scipy.linalg.misc import norm
 import numpy.linalg
@@ -116,7 +117,7 @@ lg.info('genetate original sketch time = '+str(sketchT))
 time1 = time.time()
 sketchM = weightSimpleSketch(trainSamples, sketchNum)
 [weightSketchTrain,weightSketchTest] = getWeightSimpleSketchData(trainSamples,testSamples,sketchM)
-wegihtSketchT = time.time() - time1
+weightSketchT = time.time() - time1
 lg.info('generate weightSketch time = '+str(weightSketchT))
 
 #带平移中心化的sketch
@@ -184,7 +185,7 @@ lg.info('o done!----------------------------')
 
 time1 = time.time()
 weightSketchAccuracy = svmTest(trainSamples, trainLabels, testSamples,testLabels,'linear',100.)
-wtimes = times.times() - time1
+wtimes = time.times() - time1
 print 'weightSketch done!-------------------------'
 lg.info('weightSketch done!-------------------------')
  
@@ -229,3 +230,4 @@ lg.info('randSketchAcc = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchT
 lg.info('weightSketchAcc = '+str(weightSketchAccuracy)+' time = '+str(weightSketchT))
 lg.info('centeredPcaAcc= '+str(centeredPcaAccuracy) + ' time = ' + str(centeredPcaTime))
 lg.info('affSketchAcc= ' + str(affSketchAccuracy) + ' time = '+ str(affSketchTime))
+
