@@ -113,12 +113,19 @@ sketchM = simpleSketch(trainSamples, sketchNum)
 sketchT = time.time() - time1
 lg.info('genetate original sketch time = '+str(sketchT))
 
-#加权sketch
+#weight sketch
 time1 = time.time()
 sketchM = weightSimpleSketch(trainSamples, sketchNum)
 [weightSketchTrain,weightSketchTest] = getWeightSimpleSketchData(trainSamples,testSamples,sketchM)
 weightSketchT = time.time() - time1
 lg.info('generate weightSketch time = '+str(weightSketchT))
+
+#randomProject Weight Sketch
+time1 = time.time()
+rpwsM = randomWeightSimpleSketch(trainSamples,sketchNum)
+[rpwsTrain,rpwsTest] = getRandomWeightSimpleSketchData(trainSamples,testSamples,rpwsM)
+rpswT = time.time() - time1
+lg.info('generate rpsT time = '+str(rpswT))
 
 #带平移中心化的sketch
 time1 = time.time()
@@ -161,6 +168,16 @@ lg.info(randSketchAccuracy)
 print 'randSketch done~--------------'
 lg.info('randSketch done!----------------')
 
+#rpws  
+time1 = time.time()
+rpwsAccuracy = svmTest(rpwsTrain,trainLabels,rpwsTest,testLabels,'linear',100.)
+rpwsTime = time.time() - time1
+print 'rpws done~--------------'
+lg.info('rpws done!----------------')
+print 'rpws acc = ',rpwsAccuracy
+
+#should be removed
+print randSketchAccuracy
 
 #带平移的sketch
 time1 = time.time()
@@ -185,7 +202,7 @@ lg.info('o done!----------------------------')
 
 time1 = time.time()
 weightSketchAccuracy = svmTest(trainSamples, trainLabels, testSamples,testLabels,'linear',100.)
-wtimes = time.times() - time1
+wtimes = time.time() - time1
 print 'weightSketch done!-------------------------'
 lg.info('weightSketch done!-------------------------')
  
@@ -224,6 +241,7 @@ lg.info(' ')
 #lg.info('numberOfSubspaces = '+ str(numberOfPieces))
 #lg.info('pacc = '+ str(pAccuracy)+ '    time = '+ str(psketchTime))
 lg.info('acc = '+ str(oAccuracy)+ '    time = '+ str(otimes))
+lg.info('rpwsacc = '+str(rpwsAccuracy)+'   time = '+ str(rpwsTime))
 lg.info('pcaAcc = '+ str(pcaAccuracy)+ '    time = '+ str(pcaTime))
 lg.info('sketchAcc = '+ str(sketchAccuracy)+ ' time  = '+ str(sketchTime))
 lg.info('randSketchAcc = '+str(randSketchAccuracy)+ ' time = ' + str(randSketchTime))
